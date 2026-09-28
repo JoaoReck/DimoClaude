@@ -1,0 +1,185 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    /* Paleta Oficial Dimo: Baunilha + Carvão */
+    --vanilla-light: #EDE8D0;
+    --vanilla-ash: #C4C0AB;
+    --gray-medium: #9D9988;
+    --gray-olive: #777567;
+    --charcoal-warm: #545248;
+    --charcoal-dark: #33312B;
+    --charcoal-black: #141410;
+    --bg-main: #EDE8D0;
+    --surface: #FAF8F0;
+    --surface-secondary: #C4C0AB;
+    --border-subtle: #C4C0AB;
+    --border-medium: #9D9988;
+    --text-primary: #141410;
+    --text-charcoal: #33312B;
+    --text-secondary: #777567;
+    --text-muted: #9D9988;
+  }
+
+  html {
+    width: 100%;
+    height: 100%;
+    height: 100dvh;
+    max-width: 100vw;
+    overflow: hidden;
+    overscroll-behavior: none;
+    -webkit-text-size-adjust: 100%;
+    background-color: var(--bg-main);
+  }
+
+  body {
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    height: 100%;
+    height: 100dvh;
+    width: 100%;
+    max-width: 100vw;
+    overflow: hidden;
+    overscroll-behavior: none;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  #root {
+    width: 100%;
+    height: 100%;
+    height: 100dvh;
+    max-width: 100vw;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--bg-main);
+  }
+
+  /* Custom scrollbar - Vanilla & Charcoal tones */
+  ::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #EDE8D0;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #C4C0AB;
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #9D9988;
+  }
+}
+
+/* ==========================================================================
+   ESTRUTURA DE TOPO FIXA E NÍTIDA NO iOS (PWA STANDALONE & SAFARI)
+   1. body::before cria a barreira física sólida na Safe Area do iPhone
+   2. padding-top com folga de segurança adicional (16px + env) para afastar
+      completamente os ícones da zona onde o WebKit projeta o desfoque
+   3. Bloqueio total de qualquer backdrop-filter no cabeçalho
+   ========================================================================== */
+
+/* Barreira física sólida sob a Dynamic Island / Status Bar no PWA */
+@media (display-mode: standalone) {
+  body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: calc(env(safe-area-inset-top, 0px) + 8px);
+    background-color: #EDE8D0;
+    z-index: 99999;
+    pointer-events: none;
+  }
+
+  header,
+  .toolbar-container {
+    padding-top: calc(env(safe-area-inset-top, 0px) + 16px);
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    filter: none !important;
+    background-color: #EDE8D0 !important;
+  }
+}
+
+/* Fallback para Safari normal */
+header,
+.toolbar-container {
+  padding-top: env(safe-area-inset-top, 0px);
+  background-color: #EDE8D0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Sharp vector rendering & smooth subpixel anti-aliasing */
+svg {
+  shape-rendering: geometricPrecision;
+}
+
+.crisp-nav-icon {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Pixel art rendering utility */
+.pixel-crisp {
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+  image-rendering: pixelated;
+}
+
+/* Micro-interaction Spring & Hover curves */
+.transition-micro {
+  transition-property: transform, opacity, background-color, border-color, box-shadow;
+  transition-duration: 220ms;
+  transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Shared button/row feedback language (Clint Hess inspired): subtle lift on
+   hover, quiet compression on press. Desktop gets the lift; touch devices
+   only get the press (no hover state to fake). */
+.press {
+  transition-property: transform, background-color, border-color, box-shadow, color;
+  transition-duration: 180ms;
+  transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+.press:active {
+  transform: scale(0.96);
+}
+@media (hover: hover) {
+  .press:hover {
+    transform: translateY(-1px);
+  }
+  .press:hover:active {
+    transform: scale(0.96);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+.font-mono-numbers {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+::selection {
+  background-color: #33312B;
+  color: #EDE8D0;
+}
