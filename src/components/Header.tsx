@@ -9,83 +9,43 @@ interface HeaderProps {
   onInstallClick?: () => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({
-  currentView,
-  onViewChange,
-}) => {
+const TABS: { id: ViewMode; label: string; Icon: typeof GitCommitVertical }[] = [
+  { id: 'timeline', label: 'Timeline / Jornada do Dia', Icon: GitCommitVertical },
+  { id: 'checklist', label: 'Checklist de Atividades', Icon: CheckSquare },
+  { id: 'calendar', label: 'Grade Diária', Icon: CalendarDays },
+];
+
+/**
+ * Icon-only nav (no big filled/rounded button background). Kept as a
+ * diagnostic + simplification: removing the large painted button surface
+ * (bg/border/shadow layer) around each icon so the toolbar has as little
+ * composited surface as possible, in case that surface was contributing to
+ * the iOS PWA icon blur. Tap targets stay ~44px via padding, not visual bulk.
+ */
+export const Header: React.FC<HeaderProps> = ({ currentView, onViewChange }) => {
   return (
     <div className="w-full border-b border-[#C4C0AB]/70 select-none bg-[#EDE8D0]">
-      <div className="w-full max-w-lg mx-auto px-3 sm:px-4 py-2 sm:py-2.5">
-        {/* Main Tab Navigation: Distributed across full width with equal, generous touch areas */}
-        <nav
-          className="w-full grid grid-cols-3 gap-2.5 sm:gap-3 items-center"
-          aria-label="Navegação Principal"
-        >
-          {/* Tab 1: Timeline (24h) */}
-          <button
-            type="button"
-            onClick={() => onViewChange('timeline')}
-            title="Timeline / Jornada do Dia"
-            aria-label="Timeline 24 horas"
-            className={`w-full h-12 sm:h-13 flex flex-col items-center justify-center rounded-2xl cursor-pointer relative group transition-all duration-200 ease-out hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.96] ${
-              currentView === 'timeline'
-                ? 'bg-[#141410] text-[#EDE8D0] border-2 border-[#141410] shadow-[0_2px_8px_rgba(20,20,16,0.18)]'
-                : 'text-[#545248] hover:text-[#141410] hover:bg-[#C4C0AB]/50 border-2 border-transparent hover:border-[#C4C0AB]/60'
-            }`}
-          >
-            <GitCommitVertical
-              className={`w-5.5 h-5.5 sm:w-6 sm:h-6 crisp-nav-icon transition-transform duration-200 group-hover:scale-110 group-hover:-translate-y-0.5 ${
-                currentView === 'timeline' ? 'stroke-[2.4] text-[#EDE8D0]' : 'stroke-[2]'
-              }`}
-            />
-            {currentView === 'timeline' && (
-              <span className="w-1.5 h-1.5 rounded-full bg-[#EDE8D0] mt-0.5" />
-            )}
-          </button>
-
-          {/* Tab 2: Checklist */}
-          <button
-            type="button"
-            onClick={() => onViewChange('checklist')}
-            title="Checklist de Atividades"
-            aria-label="Checklist de atividades"
-            className={`w-full h-12 sm:h-13 flex flex-col items-center justify-center rounded-2xl cursor-pointer relative group transition-all duration-200 ease-out hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.96] ${
-              currentView === 'checklist'
-                ? 'bg-[#141410] text-[#EDE8D0] border-2 border-[#141410] shadow-[0_2px_8px_rgba(20,20,16,0.18)]'
-                : 'text-[#545248] hover:text-[#141410] hover:bg-[#C4C0AB]/50 border-2 border-transparent hover:border-[#C4C0AB]/60'
-            }`}
-          >
-            <CheckSquare
-              className={`w-5.5 h-5.5 sm:w-6 sm:h-6 crisp-nav-icon transition-transform duration-200 group-hover:scale-110 group-hover:-translate-y-0.5 ${
-                currentView === 'checklist' ? 'stroke-[2.4] text-[#EDE8D0]' : 'stroke-[2]'
-              }`}
-            />
-            {currentView === 'checklist' && (
-              <span className="w-1.5 h-1.5 rounded-full bg-[#EDE8D0] mt-0.5" />
-            )}
-          </button>
-
-          {/* Tab 3: Calendário */}
-          <button
-            type="button"
-            onClick={() => onViewChange('calendar')}
-            title="Grade Diária"
-            aria-label="Grade diária"
-            className={`w-full h-12 sm:h-13 flex flex-col items-center justify-center rounded-2xl cursor-pointer relative group transition-all duration-200 ease-out hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.96] ${
-              currentView === 'calendar'
-                ? 'bg-[#141410] text-[#EDE8D0] border-2 border-[#141410] shadow-[0_2px_8px_rgba(20,20,16,0.18)]'
-                : 'text-[#545248] hover:text-[#141410] hover:bg-[#C4C0AB]/50 border-2 border-transparent hover:border-[#C4C0AB]/60'
-            }`}
-          >
-            <CalendarDays
-              className={`w-5.5 h-5.5 sm:w-6 sm:h-6 crisp-nav-icon transition-transform duration-200 group-hover:scale-110 group-hover:-translate-y-0.5 ${
-                currentView === 'calendar' ? 'stroke-[2.4] text-[#EDE8D0]' : 'stroke-[2]'
-              }`}
-            />
-            {currentView === 'calendar' && (
-              <span className="w-1.5 h-1.5 rounded-full bg-[#EDE8D0] mt-0.5" />
-            )}
-          </button>
+      <div className="w-full max-w-lg mx-auto px-3 sm:px-4 py-1.5">
+        <nav className="w-full grid grid-cols-3 items-center" aria-label="Navegação Principal">
+          {TABS.map(({ id, label, Icon }) => {
+            const active = currentView === id;
+            return (
+              <button
+                key={id}
+                type="button"
+                onClick={() => onViewChange(id)}
+                title={label}
+                aria-label={label}
+                aria-current={active ? 'page' : undefined}
+                className="press h-11 flex flex-col items-center justify-center gap-1 cursor-pointer"
+              >
+                <Icon
+                  className={`crisp-nav-icon w-6 h-6 ${active ? 'stroke-[2.3] text-[#141410]' : 'stroke-[2] text-[#9D9988]'}`}
+                />
+                <span className={`w-1 h-1 rounded-full transition-colors ${active ? 'bg-[#141410]' : 'bg-transparent'}`} />
+              </button>
+            );
+          })}
         </nav>
       </div>
     </div>

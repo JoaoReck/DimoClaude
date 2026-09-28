@@ -100,9 +100,23 @@
     pointer-events: none;
   }
 
+  /* DIAGNÓSTICO TEMPORÁRIO — não é a correção definitiva.
+     Hipótese: o iOS aplica uma máscara de recorte (clip) perto da Dynamic
+     Island/notch em modo standalone, e conteúdo muito próximo dessa borda
+     pode sair levemente anti-aliased mesmo com o CSS correto. Este buffer
+     extra empurra a toolbar para longe dessa borda só para confirmar/descartar
+     essa hipótese. Ajuste o valor abaixo (ou zere) e teste no iPhone:
+     - se o blur sumir, achamos a causa raiz de verdade e dá pra calibrar o
+       valor mínimo necessário (não precisa ficar em 24px);
+     - se continuar borrado mesmo assim, a causa é outra e este bloco pode
+       voltar a 0px — não é uma solução para manter "no escuro". */
+  :root {
+    --pwa-header-diagnostic-buffer: 24px;
+  }
+
   header,
   .toolbar-container {
-    padding-top: calc(env(safe-area-inset-top, 0px) + 16px);
+    padding-top: calc(env(safe-area-inset-top, 0px) + 16px + var(--pwa-header-diagnostic-buffer, 0px));
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
     filter: none !important;

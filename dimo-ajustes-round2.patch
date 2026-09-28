@@ -1,0 +1,165 @@
+diff --git a/src/components/ActivitySheet.tsx b/src/components/ActivitySheet.tsx
+index 10864be..e1a3622 100644
+--- a/src/components/ActivitySheet.tsx
++++ b/src/components/ActivitySheet.tsx
+@@ -104,7 +104,7 @@ const SheetBody: React.FC<{ state: SheetState } & Pick<Props, 'onClose' | 'onSav
+             aria-label="Título"
+           />
+ 
+-          <div className="grid grid-cols-2 gap-2.5">
++          <div className="flex flex-col gap-2.5">
+             <label className="text-[10px] font-mono text-[#777567] space-y-1 block">
+               DATA
+               <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className={field + ' font-mono text-xs'} />
+diff --git a/src/components/Header.tsx b/src/components/Header.tsx
+index b3b0225..c8e1d2c 100644
+--- a/src/components/Header.tsx
++++ b/src/components/Header.tsx
+@@ -9,83 +9,43 @@ interface HeaderProps {
+   onInstallClick?: () => void;
+ }
+ 
+-export const Header: React.FC<HeaderProps> = ({
+-  currentView,
+-  onViewChange,
+-}) => {
++const TABS: { id: ViewMode; label: string; Icon: typeof GitCommitVertical }[] = [
++  { id: 'timeline', label: 'Timeline / Jornada do Dia', Icon: GitCommitVertical },
++  { id: 'checklist', label: 'Checklist de Atividades', Icon: CheckSquare },
++  { id: 'calendar', label: 'Grade Diária', Icon: CalendarDays },
++];
++
++/**
++ * Icon-only nav (no big filled/rounded button background). Kept as a
++ * diagnostic + simplification: removing the large painted button surface
++ * (bg/border/shadow layer) around each icon so the toolbar has as little
++ * composited surface as possible, in case that surface was contributing to
++ * the iOS PWA icon blur. Tap targets stay ~44px via padding, not visual bulk.
++ */
++export const Header: React.FC<HeaderProps> = ({ currentView, onViewChange }) => {
+   return (
+     <div className="w-full border-b border-[#C4C0AB]/70 select-none bg-[#EDE8D0]">
+-      <div className="w-full max-w-lg mx-auto px-3 sm:px-4 py-2 sm:py-2.5">
+-        {/* Main Tab Navigation: Distributed across full width with equal, generous touch areas */}
+-        <nav
+-          className="w-full grid grid-cols-3 gap-2.5 sm:gap-3 items-center"
+-          aria-label="Navegação Principal"
+-        >
+-          {/* Tab 1: Timeline (24h) */}
+-          <button
+-            type="button"
+-            onClick={() => onViewChange('timeline')}
+-            title="Timeline / Jornada do Dia"
+-            aria-label="Timeline 24 horas"
+-            className={`w-full h-12 sm:h-13 flex flex-col items-center justify-center rounded-2xl cursor-pointer relative group transition-all duration-200 ease-out hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.96] ${
+-              currentView === 'timeline'
+-                ? 'bg-[#141410] text-[#EDE8D0] border-2 border-[#141410] shadow-[0_2px_8px_rgba(20,20,16,0.18)]'
+-                : 'text-[#545248] hover:text-[#141410] hover:bg-[#C4C0AB]/50 border-2 border-transparent hover:border-[#C4C0AB]/60'
+-            }`}
+-          >
+-            <GitCommitVertical
+-              className={`w-5.5 h-5.5 sm:w-6 sm:h-6 crisp-nav-icon transition-transform duration-200 group-hover:scale-110 group-hover:-translate-y-0.5 ${
+-                currentView === 'timeline' ? 'stroke-[2.4] text-[#EDE8D0]' : 'stroke-[2]'
+-              }`}
+-            />
+-            {currentView === 'timeline' && (
+-              <span className="w-1.5 h-1.5 rounded-full bg-[#EDE8D0] mt-0.5" />
+-            )}
+-          </button>
+-
+-          {/* Tab 2: Checklist */}
+-          <button
+-            type="button"
+-            onClick={() => onViewChange('checklist')}
+-            title="Checklist de Atividades"
+-            aria-label="Checklist de atividades"
+-            className={`w-full h-12 sm:h-13 flex flex-col items-center justify-center rounded-2xl cursor-pointer relative group transition-all duration-200 ease-out hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.96] ${
+-              currentView === 'checklist'
+-                ? 'bg-[#141410] text-[#EDE8D0] border-2 border-[#141410] shadow-[0_2px_8px_rgba(20,20,16,0.18)]'
+-                : 'text-[#545248] hover:text-[#141410] hover:bg-[#C4C0AB]/50 border-2 border-transparent hover:border-[#C4C0AB]/60'
+-            }`}
+-          >
+-            <CheckSquare
+-              className={`w-5.5 h-5.5 sm:w-6 sm:h-6 crisp-nav-icon transition-transform duration-200 group-hover:scale-110 group-hover:-translate-y-0.5 ${
+-                currentView === 'checklist' ? 'stroke-[2.4] text-[#EDE8D0]' : 'stroke-[2]'
+-              }`}
+-            />
+-            {currentView === 'checklist' && (
+-              <span className="w-1.5 h-1.5 rounded-full bg-[#EDE8D0] mt-0.5" />
+-            )}
+-          </button>
+-
+-          {/* Tab 3: Calendário */}
+-          <button
+-            type="button"
+-            onClick={() => onViewChange('calendar')}
+-            title="Grade Diária"
+-            aria-label="Grade diária"
+-            className={`w-full h-12 sm:h-13 flex flex-col items-center justify-center rounded-2xl cursor-pointer relative group transition-all duration-200 ease-out hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.96] ${
+-              currentView === 'calendar'
+-                ? 'bg-[#141410] text-[#EDE8D0] border-2 border-[#141410] shadow-[0_2px_8px_rgba(20,20,16,0.18)]'
+-                : 'text-[#545248] hover:text-[#141410] hover:bg-[#C4C0AB]/50 border-2 border-transparent hover:border-[#C4C0AB]/60'
+-            }`}
+-          >
+-            <CalendarDays
+-              className={`w-5.5 h-5.5 sm:w-6 sm:h-6 crisp-nav-icon transition-transform duration-200 group-hover:scale-110 group-hover:-translate-y-0.5 ${
+-                currentView === 'calendar' ? 'stroke-[2.4] text-[#EDE8D0]' : 'stroke-[2]'
+-              }`}
+-            />
+-            {currentView === 'calendar' && (
+-              <span className="w-1.5 h-1.5 rounded-full bg-[#EDE8D0] mt-0.5" />
+-            )}
+-          </button>
++      <div className="w-full max-w-lg mx-auto px-3 sm:px-4 py-1.5">
++        <nav className="w-full grid grid-cols-3 items-center" aria-label="Navegação Principal">
++          {TABS.map(({ id, label, Icon }) => {
++            const active = currentView === id;
++            return (
++              <button
++                key={id}
++                type="button"
++                onClick={() => onViewChange(id)}
++                title={label}
++                aria-label={label}
++                aria-current={active ? 'page' : undefined}
++                className="press h-11 flex flex-col items-center justify-center gap-1 cursor-pointer"
++              >
++                <Icon
++                  className={`crisp-nav-icon w-6 h-6 ${active ? 'stroke-[2.3] text-[#141410]' : 'stroke-[2] text-[#9D9988]'}`}
++                />
++                <span className={`w-1 h-1 rounded-full transition-colors ${active ? 'bg-[#141410]' : 'bg-transparent'}`} />
++              </button>
++            );
++          })}
+         </nav>
+       </div>
+     </div>
+diff --git a/src/index.css b/src/index.css
+index f971047..5ecb93b 100644
+--- a/src/index.css
++++ b/src/index.css
+@@ -100,9 +100,23 @@
+     pointer-events: none;
+   }
+ 
++  /* DIAGNÓSTICO TEMPORÁRIO — não é a correção definitiva.
++     Hipótese: o iOS aplica uma máscara de recorte (clip) perto da Dynamic
++     Island/notch em modo standalone, e conteúdo muito próximo dessa borda
++     pode sair levemente anti-aliased mesmo com o CSS correto. Este buffer
++     extra empurra a toolbar para longe dessa borda só para confirmar/descartar
++     essa hipótese. Ajuste o valor abaixo (ou zere) e teste no iPhone:
++     - se o blur sumir, achamos a causa raiz de verdade e dá pra calibrar o
++       valor mínimo necessário (não precisa ficar em 24px);
++     - se continuar borrado mesmo assim, a causa é outra e este bloco pode
++       voltar a 0px — não é uma solução para manter "no escuro". */
++  :root {
++    --pwa-header-diagnostic-buffer: 24px;
++  }
++
+   header,
+   .toolbar-container {
+-    padding-top: calc(env(safe-area-inset-top, 0px) + 16px);
++    padding-top: calc(env(safe-area-inset-top, 0px) + 16px + var(--pwa-header-diagnostic-buffer, 0px));
+     backdrop-filter: none !important;
+     -webkit-backdrop-filter: none !important;
+     filter: none !important;

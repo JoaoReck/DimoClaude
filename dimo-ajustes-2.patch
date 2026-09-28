@@ -1,0 +1,455 @@
+diff --git a/public/index.html b/public/index.html
+deleted file mode 100644
+index 5176027..0000000
+--- a/public/index.html
++++ /dev/null
+@@ -1,89 +0,0 @@
+-<!DOCTYPE html>
+-<html>
+-  <head>
+-    <meta charset="utf-8">
+-    <meta name="viewport" content="width=device-width, initial-scale=1">
+-    <title>Welcome to Firebase Hosting</title>
+-
+-    <!-- update the version number as needed -->
+-    <script defer src="/__/firebase/12.19.0/firebase-app-compat.js"></script>
+-    <!-- include only the Firebase features as you need -->
+-    <script defer src="/__/firebase/12.19.0/firebase-auth-compat.js"></script>
+-    <script defer src="/__/firebase/12.19.0/firebase-database-compat.js"></script>
+-    <script defer src="/__/firebase/12.19.0/firebase-firestore-compat.js"></script>
+-    <script defer src="/__/firebase/12.19.0/firebase-functions-compat.js"></script>
+-    <script defer src="/__/firebase/12.19.0/firebase-messaging-compat.js"></script>
+-    <script defer src="/__/firebase/12.19.0/firebase-storage-compat.js"></script>
+-    <script defer src="/__/firebase/12.19.0/firebase-analytics-compat.js"></script>
+-    <script defer src="/__/firebase/12.19.0/firebase-remote-config-compat.js"></script>
+-    <script defer src="/__/firebase/12.19.0/firebase-performance-compat.js"></script>
+-    <!-- 
+-      initialize the SDK after all desired features are loaded, set useEmulator to false
+-      to avoid connecting the SDK to running emulators.
+-    -->
+-    <script defer src="/__/firebase/init.js?useEmulator=true"></script>
+-
+-    <style media="screen">
+-      body { background: #ECEFF1; color: rgba(0,0,0,0.87); font-family: Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; }
+-      #message { background: white; max-width: 360px; margin: 100px auto 16px; padding: 32px 24px; border-radius: 3px; }
+-      #message h2 { color: #ffa100; font-weight: bold; font-size: 16px; margin: 0 0 8px; }
+-      #message h1 { font-size: 22px; font-weight: 300; color: rgba(0,0,0,0.6); margin: 0 0 16px;}
+-      #message p { line-height: 140%; margin: 16px 0 24px; font-size: 14px; }
+-      #message a { display: block; text-align: center; background: #039be5; text-transform: uppercase; text-decoration: none; color: white; padding: 16px; border-radius: 4px; }
+-      #message, #message a { box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24); }
+-      #load { color: rgba(0,0,0,0.4); text-align: center; font-size: 13px; }
+-      @media (max-width: 600px) {
+-        body, #message { margin-top: 0; background: white; box-shadow: none; }
+-        body { border-top: 16px solid #ffa100; }
+-      }
+-    </style>
+-  </head>
+-  <body>
+-    <div id="message">
+-      <h2>Welcome</h2>
+-      <h1>Firebase Hosting Setup Complete</h1>
+-      <p>You're seeing this because you've successfully setup Firebase Hosting. Now it's time to go build something extraordinary!</p>
+-      <a target="_blank" href="https://firebase.google.com/docs/hosting/">Open Hosting Documentation</a>
+-    </div>
+-    <p id="load">Firebase SDK Loading&hellip;</p>
+-
+-    <script>
+-      document.addEventListener('DOMContentLoaded', function() {
+-        const loadEl = document.querySelector('#load');
+-        // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
+-        // // The Firebase SDK is initialized and available here!
+-        //
+-        // firebase.auth().onAuthStateChanged(user => { });
+-        // firebase.database().ref('/path/to/ref').on('value', snapshot => { });
+-        // firebase.firestore().doc('/foo/bar').get().then(() => { });
+-        // firebase.functions().httpsCallable('yourFunction')().then(() => { });
+-        // firebase.messaging().requestPermission().then(() => { });
+-        // firebase.storage().ref('/path/to/ref').getDownloadURL().then(() => { });
+-        // firebase.analytics(); // call to activate
+-        // firebase.analytics().logEvent('tutorial_completed');
+-        // firebase.performance(); // call to activate
+-        //
+-        // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
+-
+-        try {
+-          let app = firebase.app();
+-          let features = [
+-            'auth', 
+-            'database', 
+-            'firestore',
+-            'functions',
+-            'messaging', 
+-            'storage', 
+-            'analytics', 
+-            'remoteConfig',
+-            'performance',
+-          ].filter(feature => typeof app[feature] === 'function');
+-          loadEl.textContent = `Firebase SDK loaded with ${features.join(', ')}`;
+-        } catch (e) {
+-          console.error(e);
+-          loadEl.textContent = 'Error loading the Firebase SDK, check the console.';
+-        }
+-      });
+-    </script>
+-  </body>
+-</html>
+diff --git a/src/components/ActivitySheet.tsx b/src/components/ActivitySheet.tsx
+index 0decb29..e1a3622 100644
+--- a/src/components/ActivitySheet.tsx
++++ b/src/components/ActivitySheet.tsx
+@@ -23,6 +23,13 @@ export const ActivitySheet: React.FC<Props> = ({ state, onClose, onSave }) => (
+   <AnimatePresence>{state && <SheetBody key={state.editingId ?? 'new'} state={state} onClose={onClose} onSave={onSave} />}</AnimatePresence>
+ );
+ 
++/**
++ * Compact, centered dialog (the iFood-style "focused panel over a dimmed
++ * background" pattern) instead of a near-fullscreen bottom sheet.
++ * Layout: fixed header + fixed footer, ONLY the middle field area scrolls,
++ * and only if it doesn't fit — on any normal phone/desktop size the whole
++ * thing fits with no scroll at all.
++ */
+ const SheetBody: React.FC<{ state: SheetState } & Pick<Props, 'onClose' | 'onSave'>> = ({ state, onClose, onSave }) => {
+   const { initial, editingId } = state;
+   const [title, setTitle] = useState(initial.title);
+@@ -48,7 +55,11 @@ const SheetBody: React.FC<{ state: SheetState } & Pick<Props, 'onClose' | 'onSav
+ 
+   return (
+     <motion.div
+-      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-[#141410]/55"
++      className="fixed inset-0 z-50 flex items-center justify-center bg-[#141410]/55 p-4"
++      style={{
++        paddingTop: 'max(1rem, env(safe-area-inset-top, 0px))',
++        paddingBottom: 'max(1rem, env(safe-area-inset-bottom, 0px))',
++      }}
+       initial={{ opacity: 0 }}
+       animate={{ opacity: 1 }}
+       exit={{ opacity: 0 }}
+@@ -57,78 +68,83 @@ const SheetBody: React.FC<{ state: SheetState } & Pick<Props, 'onClose' | 'onSav
+       <motion.form
+         onSubmit={submit}
+         onClick={(e) => e.stopPropagation()}
+-        initial={{ y: 40, opacity: 0 }}
+-        animate={{ y: 0, opacity: 1 }}
+-        exit={{ y: 40, opacity: 0 }}
+-        transition={{ duration: 0.22, ease: 'easeOut' }}
+-        className="w-full max-w-md max-h-[92dvh] overflow-y-auto rounded-t-3xl sm:rounded-3xl bg-[#FAF8F0] border border-[#C4C0AB] p-5 space-y-4"
+-        style={{ paddingBottom: 'max(1.25rem, env(safe-area-inset-bottom, 0px))' }}
++        initial={{ opacity: 0, scale: 0.96, y: 8 }}
++        animate={{ opacity: 1, scale: 1, y: 0 }}
++        exit={{ opacity: 0, scale: 0.96, y: 8 }}
++        transition={{ duration: 0.2, ease: 'easeOut' }}
++        className="w-full max-w-sm max-h-full rounded-3xl bg-[#FAF8F0] border border-[#C4C0AB] shadow-2xl flex flex-col overflow-hidden"
++        style={{ maxHeight: 'min(38rem, 100%)' }}
+         role="dialog"
+         aria-modal="true"
+         aria-label={editingId ? 'Editar atividade' : 'Nova atividade'}
+       >
+-        <div className="flex items-center justify-between">
++        {/* Header — always visible, never scrolls */}
++        <div className="shrink-0 flex items-center justify-between px-4 pt-4 pb-1">
+           <span className="text-xs font-mono font-bold tracking-wider text-[#141410]">
+             {editingId ? 'EDITAR ATIVIDADE' : 'NOVA ATIVIDADE'}
+           </span>
+-          <button type="button" onClick={onClose} aria-label="Fechar" className="press p-2 -mr-2 rounded-lg text-[#777567] hover:text-[#141410] cursor-pointer">
+-            <X className="w-5 h-5" />
++          <button type="button" onClick={onClose} aria-label="Fechar" className="press p-1.5 -mr-1.5 rounded-lg text-[#777567] hover:text-[#141410] cursor-pointer">
++            <X className="w-4.5 h-4.5" />
+           </button>
+         </div>
+ 
+-        <input
+-          autoFocus
+-          value={title}
+-          onChange={(e) => {
+-            setTitle(e.target.value);
+-            setError('');
+-            if (!iconTouched) setIcon(inferRpgIcon(e.target.value, ''));
+-          }}
+-          placeholder="O que vem neste momento?"
+-          maxLength={80}
+-          className={field + ' text-base font-semibold'}
+-          aria-label="Título"
+-        />
++        {/* Body — the only part that scrolls, and only if it truly doesn't fit */}
++        <div className="flex-1 min-h-0 overflow-y-auto px-4 py-3 space-y-3">
++          <input
++            autoFocus
++            value={title}
++            onChange={(e) => {
++              setTitle(e.target.value);
++              setError('');
++              if (!iconTouched) setIcon(inferRpgIcon(e.target.value, ''));
++            }}
++            placeholder="O que vem neste momento?"
++            maxLength={80}
++            className={field + ' text-base font-semibold'}
++            aria-label="Título"
++          />
+ 
+-        <div className="grid grid-cols-2 gap-3">
+-          <label className="text-[11px] font-mono text-[#777567] space-y-1 block">
+-            DATA
+-            <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className={field + ' font-mono'} />
+-          </label>
+-          <label className="text-[11px] font-mono text-[#777567] space-y-1 block">
+-            HORÁRIO
+-            <input type="time" value={time} onChange={(e) => setTime(e.target.value)} className={field + ' font-mono'} />
+-          </label>
+-        </div>
++          <div className="flex flex-col gap-2.5">
++            <label className="text-[10px] font-mono text-[#777567] space-y-1 block">
++              DATA
++              <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className={field + ' font-mono text-xs'} />
++            </label>
++            <label className="text-[10px] font-mono text-[#777567] space-y-1 block">
++              HORÁRIO
++              <input type="time" value={time} onChange={(e) => setTime(e.target.value)} className={field + ' font-mono text-xs'} />
++            </label>
++          </div>
+ 
+-        <div className="grid grid-cols-5 gap-1.5 p-2 rounded-2xl bg-[#EDE8D0]/80 border border-[#C4C0AB]" role="radiogroup" aria-label="Ícone">
+-          {RPG_ICON_OPTIONS.map((o) => (
+-            <button
+-              key={o.id}
+-              type="button"
+-              role="radio"
+-              aria-checked={icon === o.id}
+-              title={o.label}
+-              onClick={() => {
+-                setIcon(o.id);
+-                setIconTouched(true);
+-              }}
+-              className={`press h-12 rounded-xl flex items-center justify-center cursor-pointer border-2 ${
+-                icon === o.id ? 'bg-[#FAF8F0] border-[#141410]' : 'border-transparent hover:bg-[#FAF8F0]'
+-              }`}
+-            >
+-              <RpgIcon icon={o.id} size={24} variant={icon === o.id ? 'default' : 'muted'} />
+-            </button>
+-          ))}
+-        </div>
++          <div className="grid grid-cols-5 gap-1 p-1.5 rounded-2xl bg-[#EDE8D0]/80 border border-[#C4C0AB]" role="radiogroup" aria-label="Ícone">
++            {RPG_ICON_OPTIONS.map((o) => (
++              <button
++                key={o.id}
++                type="button"
++                role="radio"
++                aria-checked={icon === o.id}
++                title={o.label}
++                onClick={() => {
++                  setIcon(o.id);
++                  setIconTouched(true);
++                }}
++                className={`press h-10 rounded-xl flex items-center justify-center cursor-pointer border-2 ${
++                  icon === o.id ? 'bg-[#FAF8F0] border-[#141410]' : 'border-transparent hover:bg-[#FAF8F0]'
++                }`}
++              >
++                <RpgIcon icon={o.id} size={20} variant={icon === o.id ? 'default' : 'muted'} />
++              </button>
++            ))}
++          </div>
+ 
+-        {error && <p className="text-xs font-mono text-[#33312B]" role="alert">{error}</p>}
++          {error && <p className="text-xs font-mono text-[#33312B]" role="alert">{error}</p>}
++        </div>
+ 
+-        <div className="flex gap-2.5 pt-1">
+-          <button type="button" onClick={onClose} className="press flex-1 h-12 rounded-xl border border-[#C4C0AB] text-sm font-semibold text-[#545248] cursor-pointer">
++        {/* Footer — always visible, never scrolls */}
++        <div className="shrink-0 flex gap-2.5 px-4 pt-2 pb-4">
++          <button type="button" onClick={onClose} className="press flex-1 h-11 rounded-xl border border-[#C4C0AB] text-sm font-semibold text-[#545248] cursor-pointer">
+             Cancelar
+           </button>
+-          <button type="submit" className="press flex-[1.4] h-12 rounded-xl bg-[#141410] text-[#EDE8D0] text-sm font-bold cursor-pointer">
++          <button type="submit" className="press flex-[1.4] h-11 rounded-xl bg-[#141410] text-[#EDE8D0] text-sm font-bold cursor-pointer">
+             Salvar
+           </button>
+         </div>
+diff --git a/src/components/Header.tsx b/src/components/Header.tsx
+index b3b0225..c8e1d2c 100644
+--- a/src/components/Header.tsx
++++ b/src/components/Header.tsx
+@@ -9,83 +9,43 @@ interface HeaderProps {
+   onInstallClick?: () => void;
+ }
+ 
+-export const Header: React.FC<HeaderProps> = ({
+-  currentView,
+-  onViewChange,
+-}) => {
++const TABS: { id: ViewMode; label: string; Icon: typeof GitCommitVertical }[] = [
++  { id: 'timeline', label: 'Timeline / Jornada do Dia', Icon: GitCommitVertical },
++  { id: 'checklist', label: 'Checklist de Atividades', Icon: CheckSquare },
++  { id: 'calendar', label: 'Grade Diária', Icon: CalendarDays },
++];
++
++/**
++ * Icon-only nav (no big filled/rounded button background). Kept as a
++ * diagnostic + simplification: removing the large painted button surface
++ * (bg/border/shadow layer) around each icon so the toolbar has as little
++ * composited surface as possible, in case that surface was contributing to
++ * the iOS PWA icon blur. Tap targets stay ~44px via padding, not visual bulk.
++ */
++export const Header: React.FC<HeaderProps> = ({ currentView, onViewChange }) => {
+   return (
+     <div className="w-full border-b border-[#C4C0AB]/70 select-none bg-[#EDE8D0]">
+-      <div className="w-full max-w-lg mx-auto px-3 sm:px-4 py-2 sm:py-2.5">
+-        {/* Main Tab Navigation: Distributed across full width with equal, generous touch areas */}
+-        <nav
+-          className="w-full grid grid-cols-3 gap-2.5 sm:gap-3 items-center"
+-          aria-label="Navegação Principal"
+-        >
+-          {/* Tab 1: Timeline (24h) */}
+-          <button
+-            type="button"
+-            onClick={() => onViewChange('timeline')}
+-            title="Timeline / Jornada do Dia"
+-            aria-label="Timeline 24 horas"
+-            className={`w-full h-12 sm:h-13 flex flex-col items-center justify-center rounded-2xl cursor-pointer relative group transition-all duration-200 ease-out hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.96] ${
+-              currentView === 'timeline'
+-                ? 'bg-[#141410] text-[#EDE8D0] border-2 border-[#141410] shadow-[0_2px_8px_rgba(20,20,16,0.18)]'
+-                : 'text-[#545248] hover:text-[#141410] hover:bg-[#C4C0AB]/50 border-2 border-transparent hover:border-[#C4C0AB]/60'
+-            }`}
+-          >
+-            <GitCommitVertical
+-              className={`w-5.5 h-5.5 sm:w-6 sm:h-6 crisp-nav-icon transition-transform duration-200 group-hover:scale-110 group-hover:-translate-y-0.5 ${
+-                currentView === 'timeline' ? 'stroke-[2.4] text-[#EDE8D0]' : 'stroke-[2]'
+-              }`}
+-            />
+-            {currentView === 'timeline' && (
+-              <span className="w-1.5 h-1.5 rounded-full bg-[#EDE8D0] mt-0.5" />
+-            )}
+-          </button>
+-
+-          {/* Tab 2: Checklist */}
+-          <button
+-            type="button"
+-            onClick={() => onViewChange('checklist')}
+-            title="Checklist de Atividades"
+-            aria-label="Checklist de atividades"
+-            className={`w-full h-12 sm:h-13 flex flex-col items-center justify-center rounded-2xl cursor-pointer relative group transition-all duration-200 ease-out hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.96] ${
+-              currentView === 'checklist'
+-                ? 'bg-[#141410] text-[#EDE8D0] border-2 border-[#141410] shadow-[0_2px_8px_rgba(20,20,16,0.18)]'
+-                : 'text-[#545248] hover:text-[#141410] hover:bg-[#C4C0AB]/50 border-2 border-transparent hover:border-[#C4C0AB]/60'
+-            }`}
+-          >
+-            <CheckSquare
+-              className={`w-5.5 h-5.5 sm:w-6 sm:h-6 crisp-nav-icon transition-transform duration-200 group-hover:scale-110 group-hover:-translate-y-0.5 ${
+-                currentView === 'checklist' ? 'stroke-[2.4] text-[#EDE8D0]' : 'stroke-[2]'
+-              }`}
+-            />
+-            {currentView === 'checklist' && (
+-              <span className="w-1.5 h-1.5 rounded-full bg-[#EDE8D0] mt-0.5" />
+-            )}
+-          </button>
+-
+-          {/* Tab 3: Calendário */}
+-          <button
+-            type="button"
+-            onClick={() => onViewChange('calendar')}
+-            title="Grade Diária"
+-            aria-label="Grade diária"
+-            className={`w-full h-12 sm:h-13 flex flex-col items-center justify-center rounded-2xl cursor-pointer relative group transition-all duration-200 ease-out hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.96] ${
+-              currentView === 'calendar'
+-                ? 'bg-[#141410] text-[#EDE8D0] border-2 border-[#141410] shadow-[0_2px_8px_rgba(20,20,16,0.18)]'
+-                : 'text-[#545248] hover:text-[#141410] hover:bg-[#C4C0AB]/50 border-2 border-transparent hover:border-[#C4C0AB]/60'
+-            }`}
+-          >
+-            <CalendarDays
+-              className={`w-5.5 h-5.5 sm:w-6 sm:h-6 crisp-nav-icon transition-transform duration-200 group-hover:scale-110 group-hover:-translate-y-0.5 ${
+-                currentView === 'calendar' ? 'stroke-[2.4] text-[#EDE8D0]' : 'stroke-[2]'
+-              }`}
+-            />
+-            {currentView === 'calendar' && (
+-              <span className="w-1.5 h-1.5 rounded-full bg-[#EDE8D0] mt-0.5" />
+-            )}
+-          </button>
++      <div className="w-full max-w-lg mx-auto px-3 sm:px-4 py-1.5">
++        <nav className="w-full grid grid-cols-3 items-center" aria-label="Navegação Principal">
++          {TABS.map(({ id, label, Icon }) => {
++            const active = currentView === id;
++            return (
++              <button
++                key={id}
++                type="button"
++                onClick={() => onViewChange(id)}
++                title={label}
++                aria-label={label}
++                aria-current={active ? 'page' : undefined}
++                className="press h-11 flex flex-col items-center justify-center gap-1 cursor-pointer"
++              >
++                <Icon
++                  className={`crisp-nav-icon w-6 h-6 ${active ? 'stroke-[2.3] text-[#141410]' : 'stroke-[2] text-[#9D9988]'}`}
++                />
++                <span className={`w-1 h-1 rounded-full transition-colors ${active ? 'bg-[#141410]' : 'bg-transparent'}`} />
++              </button>
++            );
++          })}
+         </nav>
+       </div>
+     </div>
+diff --git a/src/index.css b/src/index.css
+index 030b5ba..5ecb93b 100644
+--- a/src/index.css
++++ b/src/index.css
+@@ -100,9 +100,23 @@
+     pointer-events: none;
+   }
+ 
++  /* DIAGNÓSTICO TEMPORÁRIO — não é a correção definitiva.
++     Hipótese: o iOS aplica uma máscara de recorte (clip) perto da Dynamic
++     Island/notch em modo standalone, e conteúdo muito próximo dessa borda
++     pode sair levemente anti-aliased mesmo com o CSS correto. Este buffer
++     extra empurra a toolbar para longe dessa borda só para confirmar/descartar
++     essa hipótese. Ajuste o valor abaixo (ou zere) e teste no iPhone:
++     - se o blur sumir, achamos a causa raiz de verdade e dá pra calibrar o
++       valor mínimo necessário (não precisa ficar em 24px);
++     - se continuar borrado mesmo assim, a causa é outra e este bloco pode
++       voltar a 0px — não é uma solução para manter "no escuro". */
++  :root {
++    --pwa-header-diagnostic-buffer: 24px;
++  }
++
+   header,
+   .toolbar-container {
+-    padding-top: calc(env(safe-area-inset-top, 0px) + 16px);
++    padding-top: calc(env(safe-area-inset-top, 0px) + 16px + var(--pwa-header-diagnostic-buffer, 0px));
+     backdrop-filter: none !important;
+     -webkit-backdrop-filter: none !important;
+     filter: none !important;
+@@ -120,15 +134,30 @@ header,
+   text-rendering: optimizeLegibility;
+ }
+ 
+-/* Sharp vector rendering & smooth subpixel anti-aliasing */
++/* Sharp vector rendering.
++   `geometricPrecision` (the previous value here) tells the renderer to favor
++   geometric/curve precision OVER crisp edges — it is the literal opposite of
++   "sharp" despite the old comment. On thin 1.5–2px strokes (the toolbar nav
++   icons) that extra anti-aliasing reads as blur specifically once the page is
++   composited without Safari's own chrome (i.e. in standalone/PWA mode).
++   crispEdges disables that edge anti-aliasing outright, which also suits the
++   RPG pixel-art icons better. */
+ svg {
+-  shape-rendering: geometricPrecision;
++  shape-rendering: crispEdges;
+ }
+ 
+-.crisp-nav-icon {
+-  -webkit-font-smoothing: antialiased;
+-  -moz-osx-font-smoothing: grayscale;
+-  text-rendering: optimizeLegibility;
++/* `.crisp-nav-icon` previously only set font-smoothing/text-rendering, which
++   have no effect on <svg> — they're text properties, not vector ones, so the
++   class never actually sharpened anything. Give the toolbar icons their own
++   GPU compositing layer instead, so iOS/WKWebView rasterizes them at the
++   display's native pixel scale rather than inheriting whatever (possibly
++   fractional) scale the standalone document's shared layer ends up with. */
++.crisp-nav-icon,
++.toolbar-container svg {
++  -webkit-transform: translateZ(0);
++  transform: translateZ(0);
++  -webkit-backface-visibility: hidden;
++  backface-visibility: hidden;
+ }
+ 
+ /* Pixel art rendering utility */

@@ -104,7 +104,7 @@ const SheetBody: React.FC<{ state: SheetState } & Pick<Props, 'onClose' | 'onSav
             aria-label="Título"
           />
 
-          <div className="grid grid-cols-2 gap-2.5">
+          <div className="flex flex-col gap-2.5">
             <label className="text-[10px] font-mono text-[#777567] space-y-1 block">
               DATA
               <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className={field + ' font-mono text-xs'} />
