@@ -30,6 +30,9 @@
     overscroll-behavior: none;
     -webkit-text-size-adjust: 100%;
     background-color: var(--bg-main);
+    -webkit-user-select: none;
+    user-select: none;
+    touch-action: manipulation;
   }
 
   body {
@@ -45,6 +48,9 @@
     margin: 0;
     padding: 0;
     -webkit-tap-highlight-color: transparent;
+    -webkit-user-select: none;
+    user-select: none;
+    touch-action: manipulation;
   }
 
   #root {
@@ -100,23 +106,21 @@
     pointer-events: none;
   }
 
-  /* DIAGNÓSTICO TEMPORÁRIO — não é a correção definitiva.
-     Hipótese: o iOS aplica uma máscara de recorte (clip) perto da Dynamic
-     Island/notch em modo standalone, e conteúdo muito próximo dessa borda
-     pode sair levemente anti-aliased mesmo com o CSS correto. Este buffer
-     extra empurra a toolbar para longe dessa borda só para confirmar/descartar
-     essa hipótese. Ajuste o valor abaixo (ou zere) e teste no iPhone:
-     - se o blur sumir, achamos a causa raiz de verdade e dá pra calibrar o
-       valor mínimo necessário (não precisa ficar em 24px);
-     - se continuar borrado mesmo assim, a causa é outra e este bloco pode
-       voltar a 0px — não é uma solução para manter "no escuro". */
+  /* Confirmado em iPhone real: o iOS aplica uma máscara de recorte (clip)
+     perto da Dynamic Island/status bar em modo standalone, e conteúdo
+     posicionado muito perto dessa borda sai levemente anti-aliased mesmo
+     com shape-rendering/GPU-layer corretos (testado — sem este buffer o
+     blur volta). 24px foi o primeiro valor testado e já resolve; ainda não
+     foi calibrado para o mínimo necessário. Se quiser a toolbar mais alta,
+     teste valores menores (12px, 8px...) direto neste número — se o blur
+     voltar, suba de novo até o menor valor que ficar nítido. */
   :root {
-    --pwa-header-diagnostic-buffer: 24px;
+    --pwa-header-safe-buffer: 24px;
   }
 
   header,
   .toolbar-container {
-    padding-top: calc(env(safe-area-inset-top, 0px) + 16px + var(--pwa-header-diagnostic-buffer, 0px));
+    padding-top: calc(env(safe-area-inset-top, 0px) + 16px + var(--pwa-header-safe-buffer, 0px));
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
     filter: none !important;
@@ -211,4 +215,9 @@ svg {
 ::selection {
   background-color: #33312B;
   color: #EDE8D0;
+}
+
+input, textarea {
+  -webkit-user-select: text;
+  user-select: text;
 }

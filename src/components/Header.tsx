@@ -15,17 +15,17 @@ const TABS: { id: ViewMode; label: string; Icon: typeof GitCommitVertical }[] = 
   { id: 'calendar', label: 'Grade Diária', Icon: CalendarDays },
 ];
 
-/**
- * Icon-only nav (no big filled/rounded button background). Kept as a
- * diagnostic + simplification: removing the large painted button surface
- * (bg/border/shadow layer) around each icon so the toolbar has as little
- * composited surface as possible, in case that surface was contributing to
- * the iOS PWA icon blur. Tap targets stay ~44px via padding, not visual bulk.
- */
 export const Header: React.FC<HeaderProps> = ({ currentView, onViewChange }) => {
   return (
-    <div className="w-full border-b border-[#C4C0AB]/70 select-none bg-[#EDE8D0]">
-      <div className="w-full max-w-lg mx-auto px-3 sm:px-4 py-1.5">
+    /* 
+      Ajuste Perfeito para o iPhone 16:
+      - pt-[calc(env(safe-area-inset-top,0px)+1.85rem)]: Aumentamos o recuo superior para ~30px além do notch. 
+        Isso joga os botões exatamente abaixo da faixa de desfoque que você descobriu no print preto.
+      - bg-[#EDE8D0]: Voltamos com o seu bege original padrão.
+      - pb-3.5: Ajustamos a base do cabeçalho para manter a proporção visual bem equilibrada.
+    */
+    <div className="w-full border-b border-[#C4C0AB]/70 select-none bg-[#EDE8D0] pt-[calc(env(safe-area-inset-top,0px)+1.85rem)] pb-3.5">
+      <div className="w-full max-w-lg mx-auto px-3 sm:px-4 isolate will-change-transform">
         <nav className="w-full grid grid-cols-3 items-center" aria-label="Navegação Principal">
           {TABS.map(({ id, label, Icon }) => {
             const active = currentView === id;
@@ -40,7 +40,9 @@ export const Header: React.FC<HeaderProps> = ({ currentView, onViewChange }) => 
                 className="press h-11 flex flex-col items-center justify-center gap-1 cursor-pointer"
               >
                 <Icon
-                  className={`crisp-nav-icon w-6 h-6 ${active ? 'stroke-[2.3] text-[#141410]' : 'stroke-[2] text-[#9D9988]'}`}
+                  className={`crisp-nav-icon w-6 h-6 transition-colors ${
+                    active ? 'stroke-[2.3] text-[#141410]' : 'stroke- text-[#9D9988]'
+                  }`}
                 />
                 <span className={`w-1 h-1 rounded-full transition-colors ${active ? 'bg-[#141410]' : 'bg-transparent'}`} />
               </button>

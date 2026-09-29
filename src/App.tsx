@@ -104,32 +104,32 @@ export default function App() {
         <DaySelector date={selectedDate} today={today} onPrev={goPrev} onNext={goNext} onToday={goToday} />
       </header>
 
-      <main {...swipe} className="w-full flex-1 min-h-0 relative flex flex-col touch-pan-y">
-        {view === 'timeline' && (
-          <TimelineView
-            activities={day}
-            date={selectedDate}
-            isToday={isToday}
-            now={now}
-            selectedHour={selectedHour ?? (isToday && !day.some((a) => new Date(`${a.date}T${a.time}`).getHours() === now.getHours()) ? now.getHours() : null)}
-            nextId={next?.id}
-            centerKey={centerKey}
-            onSelectEmptyHour={openCreate}
-            onOpenDetail={setDetailId}
-            onToggle={toggle}
-          />
-        )}
-        {view === 'checklist' && (
-          <div className={scroller}>
-            <ChecklistView activities={day} nextId={next?.id} onToggle={toggle} onOpenDetail={setDetailId} onGoTimeline={() => setView('timeline')} />
-          </div>
-        )}
-        {view === 'calendar' && (
-          <div className={scroller}>
-            <CalendarView all={activities} day={day} date={selectedDate} today={today} nextId={next?.id} onSelectDate={pickDate} onToggle={toggle} onOpenDetail={setDetailId} onCreateAt={openCreate} />
-          </div>
-        )}
-      </main>
+<main {...swipe} className="w-full flex-1 min-h-0 relative flex flex-col touch-pan-y">
+  {view === 'timeline' && (
+    <TimelineView
+      activities={day}
+      date={selectedDate}
+      isToday={isToday}
+      now={now}
+      selectedHour={selectedHour ?? (isToday && !day.some((a) => new Date(`${a.date}T${a.time}`).getHours() === now.getHours()) ? now.getHours() : null)}
+      nextId={next?.id}
+      centerKey={centerKey}
+      onSelectEmptyHour={openCreate}
+      onOpenDetail={setDetailId}
+      onToggle={toggle}
+    />
+  )}
+  {view === 'checklist' && (
+    <div className={scroller}>
+      <ChecklistView activities={day} nextId={next?.id} onToggle={toggle} onOpenDetail={setDetailId} onGoTimeline={() => setView('timeline')} />
+    </div>
+  )}
+  {view === 'calendar' && (
+    <div className={scroller}>
+      <CalendarView all={activities} day={day} date={selectedDate} today={today} nextId={next?.id} onSelectDate={pickDate} onToggle={toggle} onOpenDetail={setDetailId} onCreateAt={openCreate} />
+    </div>
+  )}
+</main>
 
       <FooterBar done={done} total={total} />
 
