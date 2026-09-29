@@ -1,7 +1,6 @@
-const CACHE_NAME = 'dimo-pwa-v6-crispbar';
+const CACHE_NAME = 'dimo-pwa-v7-fresh-nav';
 const ASSETS_TO_CACHE = [
   '/',
-  '/index.html',
   '/manifest.webmanifest',
   '/apple-touch-icon.png',
   '/apple-touch-icon-precomposed.png',
@@ -38,31 +37,49 @@ self.addEventListener('activate', (event) => {
 
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
-  
-  // Don't intercept API routes or non-HTTP schemes
+
   const url = new URL(event.request.url);
   if (url.protocol !== 'http:' && url.protocol !== 'https:') return;
 
+  // Navigation requests (the HTML document itself) MUST be network-first.
+  // Vite gives every JS/CSS bundle a content hash in its filename, and that
+  // filename is only known by reading index.html — so as long as an old,
+  // cached index.html keeps being served, the app is permanently stuck
+  // pointing at whatever bundle existed when it was first cached, no matter
+  // how many times a new version gets deployed. Fetching the network first
+  // here (falling back to cache only if offline) is what actually lets a
+  // deploy reach an already-installed PWA.
+  const isNavigation =
+    event.request.mode === 'navigate' ||
+    (event.request.headers.get('accept') || '').includes('text/html');
+
+  if (isNavigation) {
+    event.respondWith(
+      fetch(event.request)
+        .then((networkResponse) => {
+          if (networkResponse && networkResponse.status === 200) {
+            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, networkResponse.clone()));
+          }
+          return networkResponse;
+        })
+        .catch(() => caches.match(event.request).then((cached) => cached || caches.match('/')))
+    );
+    return;
+  }
+
+  // Everything else (hashed JS/CSS/images) is content-addressed: the same
+  // URL always means the same bytes, so cache-first is both safe and fast.
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
       if (cachedResponse) {
-        // Return cached and fetch in background to update
         fetch(event.request).then((networkResponse) => {
           if (networkResponse && networkResponse.status === 200) {
-            caches.open(CACHE_NAME).then((cache) => {
-              cache.put(event.request, networkResponse);
-            });
+            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, networkResponse));
           }
         }).catch(() => {});
         return cachedResponse;
       }
-      return fetch(event.request).then((networkResponse) => {
-        return networkResponse;
-      }).catch(() => {
-        if (event.request.headers.get('accept')?.includes('text/html')) {
-          return caches.match('/');
-        }
-      });
+      return fetch(event.request).catch(() => undefined);
     })
   );
 });
